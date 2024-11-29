@@ -10,7 +10,9 @@ const root = ReactDOM.createRoot(container); // Create the root
 root.render(
   <React.StrictMode>
     <Router>
-      <App />
+      <div className="font-lato font-bold">
+        <App />
+      </div >
     </Router>
   </React.StrictMode>
 );

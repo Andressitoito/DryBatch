@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Lotes from './pages/Lotes';
+import '@fontsource/lato'; // Defaults to weight 400
 
 const App = () => {
   return (
