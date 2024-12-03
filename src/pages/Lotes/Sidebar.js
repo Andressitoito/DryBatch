@@ -1,7 +1,7 @@
 import React from "react";
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
-const Sidebar = ({ selectedProductCode, onSelectProduct, onAddProduct, products = [] }) => {
+const Sidebar = ({ selectedProductCode, onSelectProduct, onAddProduct, products }) => {
   return (
     <div className="w-full md:w-1/4 bg-primary p-4 text-white relative h-auto min-h-screen">
       <h2 className="text-xl font-bold mb-4 flex justify-between items-center">
@@ -18,7 +18,7 @@ const Sidebar = ({ selectedProductCode, onSelectProduct, onAddProduct, products 
       <ul>
         {products.map((product) => (
           <li
-            key={product.code}
+            key={product.code}  // Use product.code as a unique key
             className={`cursor-pointer p-2 mb-2 rounded-lg ${
               selectedProductCode === product.code
                 ? "bg-lightAccent"

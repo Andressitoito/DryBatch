@@ -34,9 +34,13 @@ const Table = ({ measurements }) => {
                   <td className="px-4 py-2 border text-center align-middle">{totalInitialGross.toFixed(2)}</td>
                   <td className="px-4 py-2 border text-center align-middle">{totalCurrentGross.toFixed(2)}</td>
                   <td className="px-4 py-2 border text-center align-middle">
-                    <span className={totalWeightLoss > 0 ? 'text-green-600 font-bold text-xl' : 'text-red-600 font-bold text-xl'}>
-                      <span className="text-2xl font-bold">{totalWeightLoss > 0 ? '↓' : '↑'}</span> <span className="text-base">{Math.abs(totalWeightLoss).toFixed(2)}</span>
-                    </span>
+                    {totalWeightLoss !== 0 ? (
+                      <span className={totalWeightLoss > 0 ? 'text-green-600 font-bold text-xl' : 'text-red-600 font-bold text-xl'}>
+                        <span className="text-2xl font-bold">{totalWeightLoss > 0 ? '↓' : '↑'}</span> <span className="text-base">{Math.abs(totalWeightLoss).toFixed(2)}</span>
+                      </span>
+                    ) : (
+                      "0"
+                    )}
                   </td>
                   <td className="px-4 py-2 border text-center align-middle">
                     {totalLossSinceLast !== 0 ? (
@@ -60,16 +64,22 @@ const Table = ({ measurements }) => {
                       <td className="px-4 py-2 border text-center align-middle">{container.initialGross.toFixed(2)}</td>
                       <td className="px-4 py-2 border text-center align-middle">{container.currentGross.toFixed(2)}</td>
                       <td className="px-4 py-2 border text-center align-middle">
-                        <span className={weightLoss > 0 ? 'text-green-600 font-bold text-xl' : 'text-red-600 font-bold text-xl'}>
-                          <span className="text-2xl font-bold">{weightLoss > 0 ? '↓' : '↑'}</span> <span className="text-base">{Math.abs(weightLoss).toFixed(2)}</span>
-                        </span>
+                        {weightLoss !== 0 ? (
+                          <span className={weightLoss > 0 ? 'text-green-600 font-bold text-xl' : 'text-red-600 font-bold text-xl'}>
+                            <span className="text-2xl font-bold">{weightLoss > 0 ? '↓' : '↑'}</span> <span className="text-base">{Math.abs(weightLoss).toFixed(2)}</span>
+                          </span>
+                        ) : (
+                          "0"
+                        )}
                       </td>
                       <td className="px-4 py-2 border text-center align-middle">
-                        {container.lossSinceLast !== undefined ? (
+                        {container.lossSinceLast !== undefined && container.lossSinceLast !== 0 ? (
                           <span className={container.lossSinceLast > 0 ? 'text-green-600 font-bold text-xl' : 'text-red-600 font-bold text-xl'}>
                             <span className="text-2xl font-bold">{container.lossSinceLast > 0 ? '↓' : '↑'}</span> <span className="text-base">{Math.abs(container.lossSinceLast).toFixed(2)}</span>
                           </span>
-                        ) : "0"}
+                        ) : (
+                          "0"
+                        )}
                       </td>
                       <td className="px-4 py-2 border text-center align-middle">{netWeight.toFixed(2)}</td>
                     </tr>

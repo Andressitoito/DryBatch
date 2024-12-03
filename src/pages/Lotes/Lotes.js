@@ -58,11 +58,11 @@ const Lotes = () => {
   };
 
   // Updated to add new product
-  const handleAddProduct = ({ name, code, containers }) => {
+  const handleAddProduct = ({ productName, productCode, containers }) => {
     const newProduct = {
       id: products.length + 1,
-      name,
-      code,
+      name: productName,  // Use the correct parameter
+      code: productCode,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       Measurements: [
@@ -78,12 +78,17 @@ const Lotes = () => {
         },
       ],
     };
-
+  
+    console.log("New product created:", newProduct);
+  
+    // Update products and select the newly added product
     setProducts((prevProducts) => [...prevProducts, newProduct]);
-    setSelectedProductCode(code);
+    setSelectedProductCode(productCode);  // Make sure to select the new product
+  
     setIsNewProductModalOpen(false);
   };
-
+  
+  
   return (
     <div className="flex flex-col md:flex-row h-auto min-h-screen">
       <Sidebar
@@ -115,7 +120,7 @@ const Lotes = () => {
           isOpen={isNewProductModalOpen}
           onClose={() => setIsNewProductModalOpen(false)}
           addProduct={handleAddProduct}
-          existingProductCodes={products ? products.map(product => product.code) : []} // Check if products exists before mapping
+          existingProductCodes={products ? products.map(product => product.code) : []} // Ensure products is defined before mapping
         />
       </div>
     </div>
