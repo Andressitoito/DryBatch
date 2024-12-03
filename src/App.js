@@ -1,9 +1,9 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './Navbar';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Lotes from './pages/Lotes';
+import Home from './pages/Home/Home';
+import Login from './pages/Login/Login';
+import Lotes from './pages/Lotes/Lotes';
 import '@fontsource/lato'; // Defaults to weight 400
 
 const App = () => {

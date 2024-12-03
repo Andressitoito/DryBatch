@@ -3,11 +3,13 @@
 export const products = [
   {
     id: 1,
-    name: "Tested Product 1",
+    name: "Test Product 1",
     code: "T001",
     createdAt: "2024-12-01T15:00:00.000Z",
+    updatedAt: "2024-12-01T15:00:00.000Z",
     Measurements: [
       {
+        id: 1,
         timestamp: "2024-12-01T18:00:00.000Z",
         lastUpdatedBy: "Usuario Actual",
         containers: [
@@ -84,38 +86,4 @@ export const products = [
       }
     ]
   },
-
 ];
-
-
-// const product = [
-//   {
-//     id: 1,
-//     name: "Tested Product 1",
-//     code: "T001",
-//     createdAt: "2024-12-01T15:00:00.000Z",
-//     Measurements: [
-//       {
-//         timestamp: "2024-12-01T18:00:00.000Z",
-//         lastUpdatedBy: "Usuario Actual",
-//         containers: [
-//           {
-//             tare: 0.3,
-//             initialGross: 4.5,
-//             currentGross: 4.2,
-//           },
-//           {
-//             tare: 0.4,
-//             initialGross: 5.0,
-//             currentGross: 4.7,
-//           },
-//           {
-//             tare: 0.4,
-//             initialGross: 5.0,
-//             currentGross: 4.7,
-//           }
-//         ]
-//       }
-//     ]
-//   },
-// ]
