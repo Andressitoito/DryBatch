@@ -1,17 +1,17 @@
+// Modal.js
 import React from "react";
 import { useForm, Controller } from "react-hook-form";
 
-const Modal = ({ isOpen, onClose, containers = [], addMeasurement }) => {
+const Modal = ({ isOpen, onClose, containers = [], addMeasurement, productId }) => {
   const { handleSubmit, control, reset, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (!containers || containers.length === 0) {
       console.error("No containers available to update.");
       return;
     }
 
     const newMeasurement = {
-      id: Date.now(),
       timestamp: new Date().toISOString(),
       lastUpdatedBy: "Usuario Actual",
       containers: containers.map((container, index) => ({
@@ -20,8 +20,13 @@ const Modal = ({ isOpen, onClose, containers = [], addMeasurement }) => {
         currentGross: parseFloat(data[`measurement_${index}`]),
       })),
     };
-    
-    addMeasurement(newMeasurement);
+
+    try {
+      await addMeasurement(productId, newMeasurement);
+    } catch (error) {
+      console.error("Error adding measurement:", error);
+    }
+
     reset(); // Clear the form after submission
     onClose();
   };

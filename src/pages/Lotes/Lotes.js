@@ -1,101 +1,80 @@
-// Lotes.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Table from "./Table";
 import Modal from "./Modal";
 import NewProductModal from "./NewProductModal";
-import { products as initialProducts } from "../../data/mockData";
+import apiService from "../../services/apiService";
 
 const Lotes = () => {
-  // Ensure products is initialized as an empty array if initialProducts is undefined
-  const [products, setProducts] = useState(initialProducts || []);
-  const [selectedProductCode, setSelectedProductCode] = useState(products[0]?.code || "");
+  const [products, setProducts] = useState([]);
+  const [selectedProductCode, setSelectedProductCode] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewProductModalOpen, setIsNewProductModalOpen] = useState(false);
 
-  const selectedProduct = products.find((product) => product.code === selectedProductCode);
-  const currentMeasurement = selectedProduct?.Measurements?.[0] || {};
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await apiService.getAllProducts();
+        setProducts(data);
+        // Set the default selected product if available
+        if (data.length > 0) {
+          setSelectedProductCode(data[0].code);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
-  // Updated to handle product selection
+  const selectedProduct = products.find((product) => product.code === selectedProductCode);
+
+  // Debugging logs
+  console.log("Selected Product:", selectedProduct);
+  console.log("Measurements:", selectedProduct?.Measurements);
+
   const handleProductSelect = (productCode) => {
     setSelectedProductCode(productCode);
   };
 
-  // Updated to handle adding new measurements to the selected product
-  const handleAddMeasurement = (newMeasurement) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) => {
-        if (product.code === selectedProductCode) {
-          const previousMeasurement = product.Measurements[product.Measurements.length - 1];
-
-          const updatedContainers = newMeasurement.containers.map((container, index) => {
-            const previousContainer = previousMeasurement?.containers[index];
-            const lossSinceLast = previousContainer
-              ? parseFloat(previousContainer.currentGross) - parseFloat(container.currentGross)
-              : 0;
-
-            return {
-              ...container,
-              lossSinceLast, // Add a field to track the loss since last measurement
-            };
-          });
-
-          return {
-            ...product,
-            Measurements: [
-              ...product.Measurements,
-              {
-                ...newMeasurement,
-                containers: updatedContainers,
-              },
-            ],
-          };
-        }
-        return product;
-      })
-    );
-    setIsModalOpen(false);
+  const handleAddMeasurement = async (newMeasurement) => {
+    try {
+      // Call the API to add the new measurement
+      const updatedProduct = await apiService.addMeasurementToProduct(selectedProduct.id, newMeasurement);
+      
+      // Update the state with the updated product details
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === updatedProduct.id ? updatedProduct : product
+        )
+      );
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error adding measurement:", error);
+    }
   };
 
-  // Updated to add new product
-  const handleAddProduct = ({ productName, productCode, containers }) => {
-    const newProduct = {
-      id: products.length + 1,
-      name: productName,  // Use the correct parameter
-      code: productCode,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      Measurements: [
-        {
-          id: 1,
-          timestamp: new Date().toISOString(),
-          lastUpdatedBy: "Usuario Actual",
-          containers: containers.map((container) => ({
-            tare: parseFloat(container.tare),
-            initialGross: parseFloat(container.initialGross),
-            currentGross: parseFloat(container.initialGross),
-          })),
-        },
-      ],
-    };
-  
-    console.log("New product created:", newProduct);
-  
-    // Update products and select the newly added product
-    setProducts((prevProducts) => [...prevProducts, newProduct]);
-    setSelectedProductCode(productCode);  // Make sure to select the new product
-  
-    setIsNewProductModalOpen(false);
+  const handleAddProduct = async (newProductData) => {
+    try {
+      // Call the API to add the new product
+      const newProduct = await apiService.addProduct(newProductData);
+      
+      // Update the state with the new product
+      setProducts((prevProducts) => [...prevProducts, newProduct]);
+      setSelectedProductCode(newProduct.code);
+      setIsNewProductModalOpen(false);
+    } catch (error) {
+      console.error("Error adding product:", error);
+    }
   };
-  
-  
+
   return (
     <div className="flex flex-col md:flex-row h-auto min-h-screen">
       <Sidebar
         selectedProductCode={selectedProductCode}
         onSelectProduct={handleProductSelect}
         onAddProduct={() => setIsNewProductModalOpen(true)}
-        products={products} // Ensure products is never undefined
+        products={products}
       />
       <div className="flex-1 p-6 bg-background">
         <h1 className="text-2xl font-bold text-primary mb-4">
@@ -109,18 +88,25 @@ const Lotes = () => {
         >
           + Agregar Medición
         </button>
-        <Table measurements={selectedProduct?.Measurements || []} />
+        
+        {selectedProduct && selectedProduct.Measurements && selectedProduct.Measurements.length > 0 ? (
+          // Correctly pass the measurements to the table
+          <Table measurements={selectedProduct.Measurements} />
+        ) : (
+          <p>No hay mediciones disponibles para este producto.</p>
+        )}
+
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          containers={currentMeasurement?.containers || []}
+          containers={selectedProduct?.Measurements?.[0]?.Containers || []}
           addMeasurement={handleAddMeasurement}
         />
         <NewProductModal
           isOpen={isNewProductModalOpen}
           onClose={() => setIsNewProductModalOpen(false)}
           addProduct={handleAddProduct}
-          existingProductCodes={products ? products.map(product => product.code) : []} // Ensure products is defined before mapping
+          existingProductCodes={products.map(product => product.code)}
         />
       </div>
     </div>

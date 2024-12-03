@@ -4,11 +4,15 @@ const Table = ({ measurements }) => {
   return (
     <div className="overflow-x-auto">
       {measurements && measurements.length > 0 && measurements.slice(0).reverse().map((measurement, groupIndex) => {
-        const totalInitialGross = measurement.containers.reduce((acc, cur) => acc + cur.initialGross, 0);
-        const totalCurrentGross = measurement.containers.reduce((acc, cur) => acc + cur.currentGross, 0);
-        const totalNetWeight = measurement.containers.reduce((acc, cur) => acc + (cur.currentGross - cur.tare), 0);
-        const totalWeightLoss = measurement.containers.reduce((acc, cur) => acc + ((cur.initialGross - cur.tare) - (cur.currentGross - cur.tare)), 0);
-        const totalLossSinceLast = measurement.containers.reduce((acc, cur) => acc + (cur.lossSinceLast || 0), 0);
+        // We should access the "Containers" array, not "containers"
+        const containers = measurement.Containers;
+
+        // Calculate totals from containers array
+        const totalInitialGross = containers.reduce((acc, cur) => acc + cur.initialGross, 0);
+        const totalCurrentGross = containers.reduce((acc, cur) => acc + cur.currentGross, 0);
+        const totalNetWeight = containers.reduce((acc, cur) => acc + (cur.currentGross - cur.tare), 0);
+        const totalWeightLoss = containers.reduce((acc, cur) => acc + ((cur.initialGross - cur.tare) - (cur.currentGross - cur.tare)), 0);
+        const totalLossSinceLast = containers.reduce((acc, cur) => acc + (cur.lossSinceLast || 0), 0);
 
         return (
           <div key={groupIndex} className="mb-6 border-b-2 border-gray-800 pb-4">
@@ -53,7 +57,7 @@ const Table = ({ measurements }) => {
                   </td>
                   <td className="px-4 py-2 border text-center align-middle">{totalNetWeight.toFixed(2)}</td>
                 </tr>
-                {measurement.containers.map((container, index) => {
+                {containers.map((container, index) => {
                   const netWeight = container.currentGross - container.tare;
                   const initialNetWeight = container.initialGross - container.tare;
                   const weightLoss = initialNetWeight - netWeight;

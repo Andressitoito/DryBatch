@@ -1,3 +1,5 @@
+// Sidebar.js
+
 import React from "react";
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 
@@ -18,7 +20,7 @@ const Sidebar = ({ selectedProductCode, onSelectProduct, onAddProduct, products 
       <ul>
         {products.map((product) => (
           <li
-            key={product.code}  // Use product.code as a unique key
+            key={product.id}  // Use product.id as a unique key
             className={`cursor-pointer p-2 mb-2 rounded-lg ${
               selectedProductCode === product.code
                 ? "bg-lightAccent"
