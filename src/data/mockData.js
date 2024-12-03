@@ -29,7 +29,8 @@ export const products = [
             currentGross: 4.7,
           }
         ]
-      }
+      },
+  
     ]
   },
   {
@@ -85,5 +86,4 @@ export const products = [
       }
     ]
   },
-
 ];
