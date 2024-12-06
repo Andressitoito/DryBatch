@@ -33,9 +33,13 @@ const Lotes = () => {
     setSelectedProductCode(productCode);
   };
 
-  const handleAddMeasurement = async (newMeasurement) => {
+  const handleAddMeasurement = async (productId, newMeasurement) => {
     try {
-      const updatedProduct = await apiService.addMeasurementToProduct(selectedProduct.id, newMeasurement);
+      if (!productId) {
+        console.error("No product ID available for adding measurement");
+        return;
+      }
+      const updatedProduct = await apiService.addMeasurementToProduct(productId, newMeasurement);
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === updatedProduct.id ? updatedProduct : product
@@ -46,6 +50,8 @@ const Lotes = () => {
       console.error("Error adding measurement:", error);
     }
   };
+
+
 
   const handleAddProduct = async (newProductData) => {
     try {
@@ -79,7 +85,7 @@ const Lotes = () => {
         >
           + Agregar Medición
         </button>
-        
+
         {selectedProduct && selectedProduct.Measurements && selectedProduct.Measurements.length > 0 ? (
           <Table measurements={selectedProduct.Measurements} />
         ) : (
@@ -91,7 +97,10 @@ const Lotes = () => {
           onClose={() => setIsModalOpen(false)}
           containers={selectedProduct?.Measurements?.[0]?.Containers || []}
           addMeasurement={handleAddMeasurement}
+          productId={selectedProduct?.id}
         />
+
+
         <NewProductModal
           isOpen={isNewProductModalOpen}
           onClose={() => setIsNewProductModalOpen(false)}
