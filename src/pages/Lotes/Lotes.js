@@ -3,7 +3,7 @@ import Sidebar from "./Sidebar";
 import Table from "./Table";
 import Modal from "./Modal";
 import NewProductModal from "./NewProductModal";
-import apiService from "../../services/apiService";
+import * as apiService from "../../services/apiService";
 
 const Lotes = () => {
   const [products, setProducts] = useState([]);
@@ -29,20 +29,17 @@ const Lotes = () => {
 
   const selectedProduct = products.find((product) => product.code === selectedProductCode);
 
-  // Debugging logs
-  console.log("Selected Product:", selectedProduct);
-  console.log("Measurements:", selectedProduct?.Measurements);
-
   const handleProductSelect = (productCode) => {
     setSelectedProductCode(productCode);
   };
 
-  const handleAddMeasurement = async (newMeasurement) => {
+  const handleAddMeasurement = async (productId, newMeasurement) => {
     try {
-      // Call the API to add the new measurement
-      const updatedProduct = await apiService.addMeasurementToProduct(selectedProduct.id, newMeasurement);
-      
-      // Update the state with the updated product details
+      if (!productId) {
+        console.error("No product ID available for adding measurement");
+        return;
+      }
+      const updatedProduct = await apiService.addMeasurementToProduct(productId, newMeasurement);
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === updatedProduct.id ? updatedProduct : product
@@ -54,12 +51,12 @@ const Lotes = () => {
     }
   };
 
+
+
   const handleAddProduct = async (newProductData) => {
     try {
-      // Call the API to add the new product
+      console.log("Add Product Button Clicked!");
       const newProduct = await apiService.addProduct(newProductData);
-      
-      // Update the state with the new product
       setProducts((prevProducts) => [...prevProducts, newProduct]);
       setSelectedProductCode(newProduct.code);
       setIsNewProductModalOpen(false);
@@ -88,9 +85,8 @@ const Lotes = () => {
         >
           + Agregar Medición
         </button>
-        
+
         {selectedProduct && selectedProduct.Measurements && selectedProduct.Measurements.length > 0 ? (
-          // Correctly pass the measurements to the table
           <Table measurements={selectedProduct.Measurements} />
         ) : (
           <p>No hay mediciones disponibles para este producto.</p>
@@ -101,7 +97,10 @@ const Lotes = () => {
           onClose={() => setIsModalOpen(false)}
           containers={selectedProduct?.Measurements?.[0]?.Containers || []}
           addMeasurement={handleAddMeasurement}
+          productId={selectedProduct?.id}
         />
+
+
         <NewProductModal
           isOpen={isNewProductModalOpen}
           onClose={() => setIsNewProductModalOpen(false)}
