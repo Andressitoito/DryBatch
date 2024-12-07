@@ -4,8 +4,10 @@ import Table from "./Table";
 import Modal from "./Modal";
 import NewProductModal from "./NewProductModal";
 import * as apiService from "../../services/apiService";
+import { useUser } from "../../contexts/UserContext"; // Import UserContext
 
 const Lotes = () => {
+  const { user } = useUser(); // Access the current user from context
   const [products, setProducts] = useState([]);
   const [selectedProductCode, setSelectedProductCode] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,11 +53,8 @@ const Lotes = () => {
     }
   };
 
-
-
   const handleAddProduct = async (newProductData) => {
     try {
-      console.log("Add Product Button Clicked!");
       const newProduct = await apiService.addProduct(newProductData);
       setProducts((prevProducts) => [...prevProducts, newProduct]);
       setSelectedProductCode(newProduct.code);
@@ -79,12 +78,15 @@ const Lotes = () => {
             {selectedProduct?.name}
           </span>
         </h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="mb-4 bg-accent text-white p-2 rounded"
-        >
-          + Agregar Medición
-        </button>
+
+        {user.username && ( // Only show the button if a user is logged in
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="mb-4 bg-accent text-white p-2 rounded"
+          >
+            + Agregar Medición
+          </button>
+        )}
 
         {selectedProduct && selectedProduct.Measurements && selectedProduct.Measurements.length > 0 ? (
           <Table measurements={selectedProduct.Measurements} />
@@ -96,10 +98,10 @@ const Lotes = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           containers={selectedProduct?.Measurements?.[0]?.Containers || []}
+          latestContainers={selectedProduct?.Measurements?.[0]?.Containers || []} // Pass the latest measurement
           addMeasurement={handleAddMeasurement}
           productId={selectedProduct?.id}
         />
-
 
         <NewProductModal
           isOpen={isNewProductModalOpen}
