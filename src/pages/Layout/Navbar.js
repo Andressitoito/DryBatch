@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaBars, FaTimes, FaUser, FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
-import { useAuth } from "../../contexts/AuthContext";
+import { useUser } from "../../contexts/UserContext"; // Use the updated UserContext
 
 const Navbar = () => {
-  const { auth, login, logout } = useAuth(); // Use global auth state
+  const { user, clearUser } = useUser(); // Access user context
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef();
 
@@ -19,13 +19,9 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Debug function to toggle authentication
-  const toggleAuthState = () => {
-    if (auth.isAuthenticated) {
-      logout();
-    } else {
-      login("Usuario Debug");
-    }
+  // Handle logout
+  const handleLogout = () => {
+    clearUser(); // Clear user data from context and localStorage
   };
 
   return (
@@ -43,28 +39,23 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             {/* Full Width Menu Links */}
             <div className="hidden md:flex space-x-4 items-center">
-              {auth.isAuthenticated ? (
+              {user ? (
                 <>
-                  <span className="hidden md:inline">{auth.username}</span>
-                  <Link
+                  <span className="hidden md:inline">{user.username}</span>
+                  {/* <Link
                     to="/profile"
                     className="p-2 rounded-md hover:bg-blue-600 transition-colors duration-200"
                     title="Perfil"
                   >
                     <FaUser className="text-xl" />
-                  </Link>
+                  </Link> */}
                   <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="p-2 rounded-md hover:bg-blue-600 transition-colors duration-200"
                     title="Cerrar Sesión"
                   >
                     <FaSignOutAlt className="text-xl" />
                   </button>
-                  <img
-                    src="/path-to-profile-photo.jpg"
-                    alt="Profile"
-                    className="h-8 w-8 rounded-full border border-gray-300"
-                  />
                 </>
               ) : (
                 <Link
@@ -93,9 +84,9 @@ const Navbar = () => {
             ref={menuRef}
             className="md:hidden bg-blue-800 text-white space-y-4 p-4"
           >
-            {auth.isAuthenticated ? (
+            {user ? (
               <>
-                <span className="block px-3 py-1">{auth.username}</span>
+                <span className="block px-3 py-1">{user.username}</span>
                 <Link
                   to="/profile"
                   className="block px-3 py-1 rounded-md hover:bg-blue-600 transition-all duration-200"
@@ -103,7 +94,7 @@ const Navbar = () => {
                   <FaUser className="inline-block mr-2" /> Perfil
                 </Link>
                 <button
-                  onClick={logout}
+                  onClick={handleLogout}
                   className="block w-full text-left px-3 py-1 rounded-md hover:bg-blue-600 transition-all duration-200"
                 >
                   <FaSignOutAlt className="inline-block mr-2" /> Cerrar Sesión
@@ -137,12 +128,6 @@ const Navbar = () => {
             Lotes
           </Link>
           <Link
-            to="/contact"
-            className="px-3 py-1 rounded-md hover:bg-blue-100 hover:text-blue-600 transition-all duration-200"
-          >
-            Contacto
-          </Link>
-          <Link
             to="/about"
             className="px-3 py-1 rounded-md hover:bg-blue-100 hover:text-blue-600 transition-all duration-200"
           >
@@ -150,16 +135,6 @@ const Navbar = () => {
           </Link>
         </div>
       </nav>
-
-      {/* Debug Button */}
-      <div className="mt-4 text-center">
-        <button
-          onClick={toggleAuthState}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-all"
-        >
-          {auth.isAuthenticated ? "Simular Logout" : "Simular Login"}
-        </button>
-      </div>
     </header>
   );
 };
