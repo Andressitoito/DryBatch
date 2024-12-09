@@ -13,10 +13,13 @@ const Table = ({ measurements }) => {
   return (
     <div className="overflow-x-auto">
       {measurements
-        .slice(0)
-        .reverse()
+        .slice() // Copy the array
         .map((measurement, groupIndex) => {
-          const containers = measurement.Containers;
+          // Sort containers by `tare` and then by `id` for consistency
+          const containers = [...measurement.Containers].sort((a, b) => {
+            if (a.tare !== b.tare) return a.tare - b.tare;
+            return a.id - b.id;
+          });
 
           // Calculate totals for the current measurement
           const totalTare = containers.reduce((acc, cur) => acc + cur.tare, 0);
@@ -28,6 +31,7 @@ const Table = ({ measurements }) => {
             0
           );
 
+          // Get the previous measurement to calculate differences
           const previousMeasurement = measurements[groupIndex + 1];
           const previousContainers = previousMeasurement?.Containers || [];
           const totalTimeElapsed =
@@ -40,12 +44,12 @@ const Table = ({ measurements }) => {
               <table className="min-w-full bg-white">
                 <thead className="bg-gray-100 font-semibold">
                   <tr>
-                    <th className="px-4 py-2 border align-middle">Tara (kg)</th>
-                    <th className="px-4 py-2 border align-middle">Peso Bruto Inicial (kg)</th>
-                    <th className="px-4 py-2 border align-middle">Peso Bruto Actual (kg)</th>
-                    <th className="px-4 py-2 border align-middle">Pérdida de Peso (kg)</th>
-                    <th className="px-4 py-2 border align-middle">Cambio desde Anterior (kg)</th>
-                    <th className="px-4 py-2 border align-middle">Peso Neto (kg)</th>
+                    <th className="px-4 py-2 border align-middle">Tara (gr)</th>
+                    <th className="px-4 py-2 border align-middle">Peso Bruto Inicial (gr)</th>
+                    <th className="px-4 py-2 border align-middle">Peso Bruto Actual (gr)</th>
+                    <th className="px-4 py-2 border align-middle">Pérdida de Peso (gr)</th>
+                    <th className="px-4 py-2 border align-middle">Cambio desde Anterior (gr)</th>
+                    <th className="px-4 py-2 border align-middle">Peso Neto (gr)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -54,10 +58,11 @@ const Table = ({ measurements }) => {
                     const initialNetWeight = container.initialGross - container.tare;
                     const weightLoss = initialNetWeight - netWeight;
 
+                    // Calculate the difference from the previous measurement
                     const previousContainer = previousContainers[index];
                     const differenceSinceLast = previousContainer
                       ? container.currentGross - previousContainer.currentGross
-                      : 0;
+                      : null;
 
                     return (
                       <tr key={index} className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}>
@@ -72,19 +77,39 @@ const Table = ({ measurements }) => {
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
                           {weightLoss !== 0 ? (
-                            <span className={weightLoss > 0 ? "text-green-600 font-bold text-xl" : "text-red-600 font-bold text-xl"}>
-                              <span className="text-2xl font-bold">{weightLoss > 0 ? "↓" : "↑"}</span>{" "}
-                              <span className="text-base">{Math.abs(weightLoss).toFixed(2)}</span>
+                            <span
+                              className={
+                                weightLoss > 0
+                                  ? "text-green-600 font-bold text-xl"
+                                  : "text-red-600 font-bold text-xl"
+                              }
+                            >
+                              <span className="text-2xl font-bold">
+                                {weightLoss > 0 ? "↓" : "↑"}
+                              </span>{" "}
+                              <span className="text-base">
+                                {Math.abs(weightLoss).toFixed(2)}
+                              </span>
                             </span>
                           ) : (
                             "0"
                           )}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
-                          {differenceSinceLast !== 0 ? (
-                            <span className={differenceSinceLast < 0 ? "text-green-600 font-bold text-xl" : "text-red-600 font-bold text-xl"}>
-                              <span className="text-2xl font-bold">{differenceSinceLast < 0 ? "↓" : "↑"}</span>{" "}
-                              <span className="text-base">{Math.abs(differenceSinceLast).toFixed(2)}</span>
+                          {differenceSinceLast !== null ? (
+                            <span
+                              className={
+                                differenceSinceLast < 0
+                                  ? "text-green-600 font-bold text-xl"
+                                  : "text-red-600 font-bold text-xl"
+                              }
+                            >
+                              <span className="text-2xl font-bold">
+                                {differenceSinceLast < 0 ? "↓" : "↑"}
+                              </span>{" "}
+                              <span className="text-base">
+                                {Math.abs(differenceSinceLast).toFixed(2)}
+                              </span>
                             </span>
                           ) : (
                             "0"

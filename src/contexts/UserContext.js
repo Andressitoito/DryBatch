@@ -1,11 +1,43 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import axios from "axios";
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  withCredentials: true,
+});
 
 // Create the UserContext
 const UserContext = createContext();
 
 // Create the provider
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({ name: "", lastname: "", username: "" });
+  const [user, setUser] = useState(null); // Start with null to differentiate between loading and no user
+  const [loading, setLoading] = useState(true); // Add loading state for session check
+
+  // Fetch the user session on component mount
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        console.log("Fetching user session...");
+        const response = await api.get("/auth/session", {
+          withCredentials: true, // Ensures cookies are sent
+        });
+    
+        console.log("Request Headers:", api.defaults.headers);
+        console.log("Session response:", response);
+        setUser(response.data.user); // Set the user from the session
+      } catch (error) {
+        console.warn("No active session found", error);
+        setUser(null); // No session
+      } finally {
+        setLoading(false); // End loading state
+      }
+    };
+    
+    fetchSession();
+  }, []);
 
   // Update user state with new data
   const updateUser = (name, lastname) => {
@@ -15,11 +47,19 @@ export const UserProvider = ({ children }) => {
 
   // Clear user state
   const clearUser = () => {
-    setUser({ name: "", lastname: "", username: "" });
+    setUser(null);
   };
 
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    user,
+    loading,
+    updateUser,
+    clearUser,
+  }), [user, loading]);
+
   return (
-    <UserContext.Provider value={{ user, updateUser, clearUser }}>
+    <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
   );

@@ -62,6 +62,21 @@ export const createUser = async (userData) => {
   }
 };
 
+// Get user session
+export const getSession = async () => {
+  try {
+    const response = await api.get("/auth/session", {
+      withCredentials: true, // Ensure cookies are included
+    });
+    
+    console.log("response ", response)
+    return response.data; // Axios automatically parses JSON
+  } catch (error) {
+    console.log("Error fetching session:", error);
+    throw new Error("No session found");
+  }
+};
+
 // --- Product APIs ---
 
 // Fetch all products including measurements and containers
@@ -135,10 +150,12 @@ export const deleteProduct = async (id) => {
   }
 };
 
+
 const apiService = {
   login,
   logout, // Added logout function
   createUser, // Added createUser function
+  getSession,
   getAllProducts,
   getProductById,
   addProduct,

@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { AiOutlinePlus, AiOutlineDelete } from 'react-icons/ai';
 import { useUser } from "../../contexts/UserContext";
 
-const NewProductModal = ({ isOpen, onClose, addProduct, existingProductCodes = [] }) => {
+const NewProductModal = ({ isOpen, onClose, addProduct }) => {
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm({
     defaultValues: {
       productName: "",
@@ -12,6 +12,7 @@ const NewProductModal = ({ isOpen, onClose, addProduct, existingProductCodes = [
     },
   });
   const { user } = useUser();
+  const [isLoading, setIsLoading] = useState(false);
 
   // useFieldArray to handle dynamic fields for containers
   const { fields, append, remove } = useFieldArray({
@@ -30,6 +31,7 @@ const NewProductModal = ({ isOpen, onClose, addProduct, existingProductCodes = [
   }, [isOpen, reset]);
 
   const onSubmit = async (data) => {
+    setIsLoading(true)
     const newProduct = {
       name: data.productName,
       code: data.productCode,
@@ -39,21 +41,24 @@ const NewProductModal = ({ isOpen, onClose, addProduct, existingProductCodes = [
           timestamp: new Date().toISOString(),
           lastUpdatedBy: user.username || "Usuario Actual",
           containers: data.containers.map((container) => ({
-            tare: parseFloat(container.tare),
-            initialGross: parseFloat(container.initialGross),
-            currentGross: parseFloat(container.initialGross),
+            tare: parseInt(container.tare),
+            initialGross: parseInt(container.initialGross) + parseInt(container.tare),
+            currentGross: parseInt(container.initialGross) + parseInt(container.tare),
             lastChange: 0,
           })),
         },
       ],
     };
-  
+
     try {
+
       await addProduct(newProduct);
       reset();
       onClose();
     } catch (error) {
       console.error("Error adding product:", error);
+    } finally {
+      setIsLoading(false); // Set loading state to false
     }
   };
 
@@ -159,7 +164,9 @@ const NewProductModal = ({ isOpen, onClose, addProduct, existingProductCodes = [
           </button>
 
           <div className="flex justify-end mt-4">
-            <button
+            {!isLoading && (
+              <button
+              disabled={isLoading}
               type="button"
               onClick={() => {
                 reset();
@@ -169,8 +176,33 @@ const NewProductModal = ({ isOpen, onClose, addProduct, existingProductCodes = [
             >
               Cancelar
             </button>
-            <button type="submit" className="bg-primary text-white p-2 rounded">
-              Crear Producto
+            )}
+            <button type="submit" className="bg-primary text-white p-2 rounded"
+              disabled={isLoading}
+            >
+              {isLoading && (
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              )}
+              {isLoading ? "Creando..." : "Crear Producto"}
             </button>
           </div>
         </form>

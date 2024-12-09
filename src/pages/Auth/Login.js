@@ -24,10 +24,18 @@ const Login = () => {
     setIsLoading(true); // Start loading
     setServerError(""); // Clear previous error message
     try {
-      const result = await apiService.login(data); // Call login API
-      updateUser(result.name, result.lastname); // Update user context with server response
+      // Call the login API and get the response
+      const result = await apiService.login(data); // Ensure apiService.login returns the response body
+  
+      // Log the response to verify its structure
+      console.log("Login Response:", result);
+  
+      // Update user context with server response
+      const { user } = result; // Extract the user object from the response
+      updateUser(user.name, user.lastname); // Update user context with name and lastname
+  
       reset(); // Clear all input fields
-      setTimeout(() => navigate("/lotes"), 1000); // Redirect after a brief delay
+      navigate("/lotes"); // Redirect after a brief delay
     } catch (error) {
       // Handle server error, set error message
       setServerError(error.response?.data?.error || "Error al iniciar sesión.");
@@ -36,6 +44,7 @@ const Login = () => {
       setIsLoading(false); // End loading
     }
   };
+  
 
   return (
     <div className="p-4 max-w-md mx-auto bg-background rounded shadow">

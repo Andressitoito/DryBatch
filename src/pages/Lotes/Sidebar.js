@@ -9,11 +9,10 @@ const Sidebar = ({ selectedProductCode, onSelectProduct, onAddProduct, products 
     <div className="w-full md:w-1/4 bg-primary p-4 text-white relative h-auto min-h-screen">
       <h2 className="text-xl font-bold mb-4 flex justify-between items-center">
         Productos
-        {user.username && ( // Show the button only if a user is logged in
+        {/* Show the button only if a user is logged in */}
+        {user?.username && (
           <button
-            onClick={() => {
-              onAddProduct();
-            }}
+            onClick={() => onAddProduct()}
             className="bg-yellow-500 text-white p-1.5 rounded-full ml-2 flex items-center justify-center"
             style={{ fontSize: "30px" }}
             title="Crear Nuevo Producto"
