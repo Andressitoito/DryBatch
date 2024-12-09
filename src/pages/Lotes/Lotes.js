@@ -65,7 +65,9 @@ const Lotes = () => {
         );
       }
 
-      await fetchProducts()
+      // Refetch products to update state
+      await fetchProducts();
+
       // Close the modal after success
       setIsModalOpen(false);
     } catch (error) {
@@ -98,7 +100,8 @@ const Lotes = () => {
           <span className="font-bold">{selectedProduct?.name}</span>
         </h1>
 
-        {user?.username && (
+        {/* Render button conditionally based on user context */}
+        {user && user.username && (
           <button
             onClick={() => setIsModalOpen(true)}
             className="mb-4 bg-accent text-white p-2 rounded"

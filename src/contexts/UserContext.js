@@ -1,12 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
-import axios from "axios";
+// import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_BASE_URL;
+// const BASE_URL = process.env.REACT_APP_BASE_URL;
 
-const api = axios.create({
-  baseURL: BASE_URL,
-  withCredentials: true,
-});
+// const api = axios.create({
+//   baseURL: BASE_URL,
+// });
 
 // Create the UserContext
 const UserContext = createContext();
@@ -16,47 +15,39 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null); // Start with null to differentiate between loading and no user
   const [loading, setLoading] = useState(true); // Add loading state for session check
 
-  // Fetch the user session on component mount
+  // Initialize user from localStorage on mount
   useEffect(() => {
-    const fetchSession = async () => {
-      try {
-        console.log("Fetching user session...");
-        const response = await api.get("/auth/session", {
-          withCredentials: true, // Ensures cookies are sent
-        });
-    
-        console.log("Request Headers:", api.defaults.headers);
-        console.log("Session response:", response);
-        setUser(response.data.user); // Set the user from the session
-      } catch (error) {
-        console.warn("No active session found", error);
-        setUser(null); // No session
-      } finally {
-        setLoading(false); // End loading state
-      }
-    };
-    
-    fetchSession();
+    const storedUser = localStorage.getItem("drybatch");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false); // End loading state after checking localStorage
   }, []);
 
-  // Update user state with new data
+  // Update user state with new data and save to localStorage
   const updateUser = (name, lastname) => {
     const username = `${capitalize(name)} ${capitalize(lastname)}`;
-    setUser({ name, lastname, username });
+    const updatedUser = { name, lastname, username };
+    setUser(updatedUser);
+    localStorage.setItem("drybatch", JSON.stringify(updatedUser));
   };
 
-  // Clear user state
+  // Clear user state and remove from localStorage
   const clearUser = () => {
-    setUser(null);
+    setUser(null); // Clear user state
+    localStorage.removeItem("drybatch"); // Remove user from localStorage
   };
 
   // Memoize the context value to prevent unnecessary re-renders
-  const contextValue = useMemo(() => ({
-    user,
-    loading,
-    updateUser,
-    clearUser,
-  }), [user, loading]);
+  const contextValue = useMemo(
+    () => ({
+      user,
+      loading,
+      updateUser,
+      clearUser,
+    }),
+    [user, loading]
+  );
 
   return (
     <UserContext.Provider value={contextValue}>

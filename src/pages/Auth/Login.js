@@ -32,8 +32,9 @@ const Login = () => {
   
       // Update user context with server response
       const { user } = result; // Extract the user object from the response
+      console.log("from backend ", user)
       updateUser(user.name, user.lastname); // Update user context with name and lastname
-  
+     
       reset(); // Clear all input fields
       navigate("/lotes"); // Redirect after a brief delay
     } catch (error) {
@@ -44,7 +45,6 @@ const Login = () => {
       setIsLoading(false); // End loading
     }
   };
-  
 
   return (
     <div className="p-4 max-w-md mx-auto bg-background rounded shadow">
