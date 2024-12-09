@@ -1,25 +1,56 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+// import axios from "axios";
+
+// const BASE_URL = process.env.REACT_APP_BASE_URL;
+
+// const api = axios.create({
+//   baseURL: BASE_URL,
+// });
 
 // Create the UserContext
 const UserContext = createContext();
 
 // Create the provider
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({ name: "", lastname: "", username: "" });
+  const [user, setUser] = useState(null); // Start with null to differentiate between loading and no user
+  const [loading, setLoading] = useState(true); // Add loading state for session check
 
-  // Update user state with new data
+  // Initialize user from localStorage on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem("drybatch");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false); // End loading state after checking localStorage
+  }, []);
+
+  // Update user state with new data and save to localStorage
   const updateUser = (name, lastname) => {
     const username = `${capitalize(name)} ${capitalize(lastname)}`;
-    setUser({ name, lastname, username });
+    const updatedUser = { name, lastname, username };
+    setUser(updatedUser);
+    localStorage.setItem("drybatch", JSON.stringify(updatedUser));
   };
 
-  // Clear user state
+  // Clear user state and remove from localStorage
   const clearUser = () => {
-    setUser({ name: "", lastname: "", username: "" });
+    setUser(null); // Clear user state
+    localStorage.removeItem("drybatch"); // Remove user from localStorage
   };
+
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      user,
+      loading,
+      updateUser,
+      clearUser,
+    }),
+    [user, loading]
+  );
 
   return (
-    <UserContext.Provider value={{ user, updateUser, clearUser }}>
+    <UserContext.Provider value={contextValue}>
       {children}
     </UserContext.Provider>
   );

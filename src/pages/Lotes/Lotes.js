@@ -4,30 +4,35 @@ import Table from "./Table";
 import Modal from "./Modal";
 import NewProductModal from "./NewProductModal";
 import * as apiService from "../../services/apiService";
+import { useUser } from "../../contexts/UserContext";
 
 const Lotes = () => {
+  const { user } = useUser(); // Access the current user from context
   const [products, setProducts] = useState([]);
   const [selectedProductCode, setSelectedProductCode] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewProductModalOpen, setIsNewProductModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await apiService.getAllProducts();
-        setProducts(data);
-        // Set the default selected product if available
-        if (data.length > 0) {
-          setSelectedProductCode(data[0].code);
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
+  const fetchProducts = async () => {
+    try {
+      const data = await apiService.getAllProducts();
+      setProducts(data);
+      if (data.length > 0) {
+        setSelectedProductCode(data[0].code); // Default to the first product
       }
-    };
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  // Fetch all products on initial render
+  useEffect(() => {
     fetchProducts();
   }, []);
 
-  const selectedProduct = products.find((product) => product.code === selectedProductCode);
+  const selectedProduct = products.find(
+    (product) => product.code === selectedProductCode
+  );
 
   const handleProductSelect = (productCode) => {
     setSelectedProductCode(productCode);
@@ -39,26 +44,42 @@ const Lotes = () => {
         console.error("No product ID available for adding measurement");
         return;
       }
-      const updatedProduct = await apiService.addMeasurementToProduct(productId, newMeasurement);
+
+      // Call the backend to add the measurement
+      await apiService.addMeasurementToProduct(productId, newMeasurement);
+
+      // Fetch the updated product data
+      const updatedProduct = await apiService.getProductById(productId);
+
+      // Update the product state
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === updatedProduct.id ? updatedProduct : product
         )
       );
+
+      // Ensure `Measurements` are ordered correctly
+      if (updatedProduct.Measurements) {
+        updatedProduct.Measurements.sort(
+          (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+        );
+      }
+
+      // Refetch products to update state
+      await fetchProducts();
+
+      // Close the modal after success
       setIsModalOpen(false);
     } catch (error) {
       console.error("Error adding measurement:", error);
     }
   };
 
-
-
   const handleAddProduct = async (newProductData) => {
     try {
-      console.log("Add Product Button Clicked!");
       const newProduct = await apiService.addProduct(newProductData);
       setProducts((prevProducts) => [...prevProducts, newProduct]);
-      setSelectedProductCode(newProduct.code);
+      setSelectedProductCode(newProduct.code); // Immediately select the new product
       setIsNewProductModalOpen(false);
     } catch (error) {
       console.error("Error adding product:", error);
@@ -75,19 +96,27 @@ const Lotes = () => {
       />
       <div className="flex-1 p-6 bg-background">
         <h1 className="text-2xl font-bold text-primary mb-4">
-          Mediciones de Secado para <span className="font-bold">
-            {selectedProduct?.name}
-          </span>
+          Mediciones de Secado para{" "}
+          <span className="font-bold">{selectedProduct?.name}</span>
         </h1>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="mb-4 bg-accent text-white p-2 rounded"
-        >
-          + Agregar Medición
-        </button>
 
-        {selectedProduct && selectedProduct.Measurements && selectedProduct.Measurements.length > 0 ? (
-          <Table measurements={selectedProduct.Measurements} />
+        {/* Render button conditionally based on user context */}
+        {user && user.username && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="mb-4 bg-accent text-white p-2 rounded"
+          >
+            + Agregar Medición
+          </button>
+        )}
+
+        {selectedProduct?.Measurements?.length > 0 ? (
+          <Table
+            initialTime={selectedProduct.createdAt}
+            measurements={selectedProduct.Measurements.sort(
+              (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+            )} // Sort measurements newest to oldest
+          />
         ) : (
           <p>No hay mediciones disponibles para este producto.</p>
         )}
@@ -96,16 +125,16 @@ const Lotes = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           containers={selectedProduct?.Measurements?.[0]?.Containers || []}
+          latestContainers={selectedProduct?.Measurements?.[0]?.Containers || []}
           addMeasurement={handleAddMeasurement}
           productId={selectedProduct?.id}
         />
-
 
         <NewProductModal
           isOpen={isNewProductModalOpen}
           onClose={() => setIsNewProductModalOpen(false)}
           addProduct={handleAddProduct}
-          existingProductCodes={products.map(product => product.code)}
+          existingProductCodes={products.map((product) => product.code)}
         />
       </div>
     </div>
