@@ -96,7 +96,6 @@ const Lotes = () => {
       />
       <div className="flex-1 p-6 bg-background">
         <h1 className="text-2xl font-bold text-primary mb-4">
-          Mediciones de Secado para{" "}
           <span className="font-bold">{selectedProduct?.name}</span>
         </h1>
 
@@ -104,7 +103,7 @@ const Lotes = () => {
         {user && user.username && (
           <button
             onClick={() => setIsModalOpen(true)}
-            className="mb-4 bg-accent text-white p-2 rounded"
+            className="mb-4 bg-blue-500 text-white p-2 rounded"
           >
             + Agregar Medición
           </button>

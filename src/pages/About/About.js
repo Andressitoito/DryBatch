@@ -6,8 +6,8 @@ const About = () => {
       <div className="container mx-auto space-y-8">
         {/* Header Section */}
         <header className="text-center py-8">
-          <h1 className="text-4xl font-bold text-gray-800">El Alma Humana en un Mundo de Riesgos Químicos</h1>
-          <p className="text-lg text-gray-600 mt-4">
+          <h1 className="text-4xl font-bold text-gray-800">El alma humana en un mundo de riesgos químicos</h1>
+          <p className="text-lg text-gray-600 italic mt-4">
             Entre vapores tóxicos y el eco de órdenes imperiosas, son los operarios quienes sostienen
             el delicado equilibrio, enfrentándose al peligro con manos temblorosas pero firmes.
           </p>
@@ -86,7 +86,7 @@ const About = () => {
         {/* Call to Action */}
         <footer className="text-center py-8">
           <h3 className="text-xl font-semibold text-gray-800">Honremos su Lucha</h3>
-          <p className="text-gray-600 mt-4">
+          <p className="text-gray-600 mt-4 italic">
             En un mundo de riesgos y sacrificios invisibles, debemos recordar y valorar a aquellos que
             enfrentan los desafíos más peligrosos con una valentía que no tiene precio.
           </p>

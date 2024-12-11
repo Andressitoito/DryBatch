@@ -31,8 +31,8 @@ const Navbar = () => {
         <div className="container mx-auto flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <img src="/path-to-logo.png" alt="DryBatch Logo" className="h-8 w-8" />
-            <h1 className="text-2xl font-bold hidden md:block">DryBatch</h1>
+            {/* <img src="/path-to-logo.png" alt="DryBatch Logo" className="h-8 w-8" /> */}
+            {/* <h1 className="text-2xl font-bold hidden md:block"></h1> */}
           </div>
 
           {/* Profile Picture and User Menu */}
