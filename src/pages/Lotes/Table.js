@@ -67,13 +67,13 @@ const Table = ({ measurements }) => {
                     return (
                       <tr key={index} className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}>
                         <td className="px-4 py-2 border text-center align-middle">
-                          {container.tare.toFixed(2)}
+                          {container.tare.toFixed(1)}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
-                          {container.initialGross.toFixed(2)}
+                          {container.initialGross.toFixed(1)}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
-                          {container.currentGross.toFixed(2)}
+                          {container.currentGross.toFixed(1)}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
                           {weightLoss !== 0 ? (
@@ -88,7 +88,7 @@ const Table = ({ measurements }) => {
                                 {weightLoss > 0 ? "↓" : "↑"}
                               </span>{" "}
                               <span className="text-base">
-                                {Math.abs(weightLoss).toFixed(2)}
+                                {Math.abs(weightLoss).toFixed(1)}
                               </span>
                             </span>
                           ) : (
@@ -108,7 +108,7 @@ const Table = ({ measurements }) => {
                                 {differenceSinceLast < 0 ? "↓" : "↑"}
                               </span>{" "}
                               <span className="text-base">
-                                {Math.abs(differenceSinceLast).toFixed(2)}
+                                {Math.abs(differenceSinceLast).toFixed(1)}
                               </span>
                             </span>
                           ) : (
@@ -116,7 +116,7 @@ const Table = ({ measurements }) => {
                           )}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
-                          {netWeight.toFixed(2)}
+                          {netWeight.toFixed(1)}
                         </td>
                       </tr>
                     );
@@ -125,20 +125,20 @@ const Table = ({ measurements }) => {
                   {/* Total row */}
                   <tr className="font-semibold italic align-middle bg-gray-200">
                     <td className="px-4 py-2 border text-center">
-                      {totalTare.toFixed(2)}
+                      {totalTare.toFixed(1)}
                     </td>
                     <td className="px-4 py-2 border text-center">
-                      {totalInitialGross.toFixed(2)}
+                      {totalInitialGross.toFixed(1)}
                     </td>
                     <td className="px-4 py-2 border text-center">
-                      {totalCurrentGross.toFixed(2)}
+                      {totalCurrentGross.toFixed(1)}
                     </td>
                     <td className="px-4 py-2 border text-center">
-                      {totalWeightLoss.toFixed(2)}
+                      {totalWeightLoss.toFixed(1)}
                     </td>
                     <td className="px-4 py-2 border text-center">-</td>
                     <td className="px-4 py-2 border text-center">
-                      {totalNetWeight.toFixed(2)}
+                      {totalNetWeight.toFixed(1)}
                     </td>
                   </tr>
                   {/* Last row with user and timestamp */}

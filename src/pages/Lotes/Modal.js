@@ -139,14 +139,14 @@ const Modal = ({ isOpen, onClose, containers = [], latestContainers = [], addMea
                   reset();
                   onClose();
                 }}
-                className="bg-gray-500 text-white p-2 rounded mr-2"
+                className="bg-gray-400 text-white p-2 rounded mr-2"
                 disabled={isLoading} // Disable Cancel button while loading
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="bg-primary text-white p-2 rounded flex items-center justify-center"
+                className="bg-blue-500 text-white p-2 rounded flex items-center justify-center"
                 disabled={isLoading} // Disable Submit button while loading
               >
                 {isLoading && (

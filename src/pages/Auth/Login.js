@@ -26,7 +26,6 @@ const Login = () => {
     try {
       // Call the login API and get the response
       const result = await apiService.login(data); // Ensure apiService.login returns the response body
-  
       // Log the response to verify its structure
       console.log("Login Response:", result);
   
