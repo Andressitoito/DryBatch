@@ -9,7 +9,7 @@ import { useUser } from "../../contexts/UserContext";
 const Lotes = () => {
   const { user } = useUser(); // Access the current user from context
   const [products, setProducts] = useState([]);
-  const [selectedProductCode, setSelectedProductCode] = useState("");
+  const [selectedProductId, setSelectedProductId] = useState(null); // Use product ID for uniqueness
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewProductModalOpen, setIsNewProductModalOpen] = useState(false);
 
@@ -17,8 +17,10 @@ const Lotes = () => {
     try {
       const data = await apiService.getAllProducts();
       setProducts(data);
-      if (data.length > 0) {
-        setSelectedProductCode(data[0].code); // Default to the first product
+
+      // Set default selected product only if none is selected
+      if (data.length > 0 && selectedProductId === null) {
+        setSelectedProductId(data[0].id);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -31,11 +33,11 @@ const Lotes = () => {
   }, []);
 
   const selectedProduct = products.find(
-    (product) => product.code === selectedProductCode
+    (product) => product.id === selectedProductId
   );
 
-  const handleProductSelect = (productCode) => {
-    setSelectedProductCode(productCode);
+  const handleProductSelect = (productId) => {
+    setSelectedProductId(productId);
   };
 
   const handleAddMeasurement = async (productId, newMeasurement) => {
@@ -58,13 +60,6 @@ const Lotes = () => {
         )
       );
 
-      // Ensure `Measurements` are ordered correctly
-      if (updatedProduct.Measurements) {
-        updatedProduct.Measurements.sort(
-          (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-        );
-      }
-
       // Refetch products to update state
       await fetchProducts();
 
@@ -79,7 +74,7 @@ const Lotes = () => {
     try {
       const newProduct = await apiService.addProduct(newProductData);
       setProducts((prevProducts) => [...prevProducts, newProduct]);
-      setSelectedProductCode(newProduct.code); // Immediately select the new product
+      setSelectedProductId(newProduct.id); // Immediately select the new product by ID
       setIsNewProductModalOpen(false);
     } catch (error) {
       console.error("Error adding product:", error);
@@ -89,7 +84,7 @@ const Lotes = () => {
   return (
     <div className="flex flex-col md:flex-row h-auto min-h-screen">
       <Sidebar
-        selectedProductCode={selectedProductCode}
+        selectedProductId={selectedProductId}
         onSelectProduct={handleProductSelect}
         onAddProduct={() => setIsNewProductModalOpen(true)}
         products={products}
@@ -133,7 +128,7 @@ const Lotes = () => {
           isOpen={isNewProductModalOpen}
           onClose={() => setIsNewProductModalOpen(false)}
           addProduct={handleAddProduct}
-          existingProductCodes={products.map((product) => product.code)}
+          existingProductIds={products.map((product) => product.id)}
         />
       </div>
     </div>

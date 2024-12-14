@@ -4,7 +4,7 @@ import { AiOutlineClockCircle } from "react-icons/ai"; // Icon to indicate creat
 import { FaSortAlphaDown } from "react-icons/fa"; // Icon to indicate name-based sorting
 import { useUser } from "../../contexts/UserContext"; // Import the UserContext
 
-const Sidebar = ({ selectedProductCode, onSelectProduct, onAddProduct, products }) => {
+const Sidebar = ({ selectedProductId, onSelectProduct, onAddProduct, products }) => {
   const { user } = useUser(); // Access the current user from context
 
   const [sortBy, setSortBy] = useState("creation");
@@ -40,7 +40,7 @@ const Sidebar = ({ selectedProductCode, onSelectProduct, onAddProduct, products 
         )}
       </h2>
 
-      {/* Absolute positioned sort toggle button with only an icon */}
+      {/* Absolute positioned sort toggle button */}
       <button
         onClick={toggleSort}
         className="absolute top-4 right-4 bg-blue-500 text-white p-2 rounded-full flex items-center justify-center"
@@ -58,11 +58,11 @@ const Sidebar = ({ selectedProductCode, onSelectProduct, onAddProduct, products 
           <li
             key={product.id} // Use product.id as the unique key
             className={`cursor-pointer p-2 mb-2 rounded-lg ${
-              selectedProductCode === product.code
+              selectedProductId === product.id
                 ? "bg-lightAccent"
                 : "hover:bg-secondary"
             }`}
-            onClick={() => onSelectProduct(product.code)}
+            onClick={() => onSelectProduct(product.id)} // Pass product.id
           >
             {product.name} ({product.code})
           </li>
