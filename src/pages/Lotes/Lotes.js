@@ -82,56 +82,57 @@ const Lotes = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-auto min-h-screen">
-      <Sidebar
-        selectedProductId={selectedProductId}
-        onSelectProduct={handleProductSelect}
-        onAddProduct={() => setIsNewProductModalOpen(true)}
-        products={products}
+      <div className="flex flex-col md:flex-row h-auto min-h-screen w-full md:max-w-[1200px] mx-0 md:mx-auto px-0 md:px-4">
+
+    <Sidebar
+      selectedProductId={selectedProductId}
+      onSelectProduct={handleProductSelect}
+      onAddProduct={() => setIsNewProductModalOpen(true)}
+      products={products}
+    />
+    <div className="flex-1 p-6 bg-background">
+      <h1 className="text-2xl font-bold text-primary mb-4">
+        <span className="font-bold">{selectedProduct?.name}</span>
+      </h1>
+  
+      {user && user.username && (
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="mb-4 bg-blue-500 text-white p-2 rounded"
+        >
+          + Agregar Medición
+        </button>
+      )}
+  
+      {selectedProduct?.Measurements?.length > 0 ? (
+        <Table
+          initialTime={selectedProduct.createdAt}
+          measurements={selectedProduct.Measurements.sort(
+            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+          )}
+        />
+      ) : (
+        <p>No hay mediciones disponibles para este producto.</p>
+      )}
+  
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        containers={selectedProduct?.Measurements?.[0]?.Containers || []}
+        latestContainers={selectedProduct?.Measurements?.[0]?.Containers || []}
+        addMeasurement={handleAddMeasurement}
+        productId={selectedProduct?.id}
       />
-      <div className="flex-1 p-6 bg-background">
-        <h1 className="text-2xl font-bold text-primary mb-4">
-          <span className="font-bold">{selectedProduct?.name}</span>
-        </h1>
-
-        {/* Render button conditionally based on user context */}
-        {user && user.username && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="mb-4 bg-blue-500 text-white p-2 rounded"
-          >
-            + Agregar Medición
-          </button>
-        )}
-
-        {selectedProduct?.Measurements?.length > 0 ? (
-          <Table
-            initialTime={selectedProduct.createdAt}
-            measurements={selectedProduct.Measurements.sort(
-              (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-            )} // Sort measurements newest to oldest
-          />
-        ) : (
-          <p>No hay mediciones disponibles para este producto.</p>
-        )}
-
-        <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          containers={selectedProduct?.Measurements?.[0]?.Containers || []}
-          latestContainers={selectedProduct?.Measurements?.[0]?.Containers || []}
-          addMeasurement={handleAddMeasurement}
-          productId={selectedProduct?.id}
-        />
-
-        <NewProductModal
-          isOpen={isNewProductModalOpen}
-          onClose={() => setIsNewProductModalOpen(false)}
-          addProduct={handleAddProduct}
-          existingProductIds={products.map((product) => product.id)}
-        />
-      </div>
+  
+      <NewProductModal
+        isOpen={isNewProductModalOpen}
+        onClose={() => setIsNewProductModalOpen(false)}
+        addProduct={handleAddProduct}
+        existingProductIds={products.map((product) => product.id)}
+      />
     </div>
+  </div>
+  
   );
 };
 
