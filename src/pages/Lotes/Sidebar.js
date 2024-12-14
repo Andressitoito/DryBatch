@@ -25,7 +25,14 @@ const Sidebar = ({ selectedProductId, onSelectProduct, onAddProduct, products })
   };
 
   return (
-    <div className="w-full md:w-1/4 bg-primary p-4 text-white relative h-auto min-h-screen">
+    <div 
+    
+    className="
+    w-full md:w-1/4 bg-primary p-4 text-white relative 
+    overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-200 
+    h-[40vh] md:h-full"
+    
+    >
       <h2 className="text-xl font-bold mb-4 flex items-center">
         Productos
         {user?.username && (
@@ -53,7 +60,10 @@ const Sidebar = ({ selectedProductId, onSelectProduct, onAddProduct, products })
         )}
       </button>
 
-      <ul>
+      {/* Product List with Scrollable Logic */}
+      <ul
+
+      >
         {sortedProducts.map((product) => (
           <li
             key={product.id} // Use product.id as the unique key
