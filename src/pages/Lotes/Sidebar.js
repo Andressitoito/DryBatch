@@ -17,15 +17,20 @@ const Sidebar = ({ selectedProductId, onSelectProduct, onAddProduct, products })
     sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  // Find the last created item (using createdAt) and set it as the selected product
+  // Ensure the parent knows about the initial selection on the first render
   useEffect(() => {
-    if (products.length > 0) {
-      const lastCreated = [...products].sort(
+    if (!selectedProductId && products.length > 0) {
+      const lastCreatedProduct = [...products].sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       )[0];
-      onSelectProduct(lastCreated.id);
+      onSelectProduct(lastCreatedProduct.id); // Notify parent
     }
-  }, [products, onSelectProduct]);
+  }, [products, selectedProductId, onSelectProduct]);
+
+  // Handle product selection
+  const handleSelectProduct = (id) => {
+    onSelectProduct(id); // Notify parent of the selection
+  };
 
   // Toggle sortBy between "updated" and "name"
   const toggleSort = () => {
@@ -73,10 +78,10 @@ const Sidebar = ({ selectedProductId, onSelectProduct, onAddProduct, products })
             key={product.id}
             className={`cursor-pointer p-2 mb-2 rounded-lg ${
               selectedProductId === product.id
-                ? "bg-lightAccent"
+                ? "bg-lightAccent text-white" // Highlight the selected product
                 : "hover:bg-secondary"
             }`}
-            onClick={() => onSelectProduct(product.id)}
+            onClick={() => handleSelectProduct(product.id)} // Allow clicking to select
           >
             {product.name} ({product.code})
           </li>
