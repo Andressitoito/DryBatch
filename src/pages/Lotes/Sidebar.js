@@ -1,37 +1,49 @@
-import React, { useState } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
-import { AiOutlineClockCircle } from "react-icons/ai"; // Icon to indicate creation-based sorting
-import { FaSortAlphaDown } from "react-icons/fa"; // Icon to indicate name-based sorting
-import { useUser } from "../../contexts/UserContext"; // Import the UserContext
+import React, { useState, useEffect } from "react";
+import { AiOutlinePlus, AiOutlineClockCircle } from "react-icons/ai";
+import { FaSortAlphaDown } from "react-icons/fa";
+import { useUser } from "../../contexts/UserContext";
 
 const Sidebar = ({ selectedProductId, onSelectProduct, onAddProduct, products }) => {
-  const { user } = useUser(); // Access the current user from context
+  const { user } = useUser();
 
-  const [sortBy, setSortBy] = useState("creation");
+  // Default sort is "updated" (updatedAt DESC)
+  const [sortBy, setSortBy] = useState("updated");
 
-  // Sort products based on sortBy state
+  // Sort products based on current sorting method
   const sortedProducts = [...products];
-  if (sortBy === "creation") {
-    // Sort by creation date (earliest first)
-    sortedProducts.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  if (sortBy === "updated") {
+    sortedProducts.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   } else if (sortBy === "name") {
-    // Sort by name alphabetically
     sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  // Toggle sortBy when the button is clicked
+  // Ensure the parent knows about the initial selection on the first render
+  useEffect(() => {
+    if (!selectedProductId && products.length > 0) {
+      const lastCreatedProduct = [...products].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      )[0];
+      onSelectProduct(lastCreatedProduct.id); // Notify parent
+    }
+  }, [products, selectedProductId, onSelectProduct]);
+
+  // Handle product selection
+  const handleSelectProduct = (id) => {
+    onSelectProduct(id); // Notify parent of the selection
+  };
+
+  // Toggle sortBy between "updated" and "name"
   const toggleSort = () => {
-    setSortBy((prev) => (prev === "creation" ? "name" : "creation"));
+    setSortBy((prev) => (prev === "updated" ? "name" : "updated"));
   };
 
   return (
-    <div 
-    
-    className="
-    w-full md:w-1/4 bg-primary p-4 text-white relative 
-    overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-200 
-    h-[40vh] md:h-full"
-    
+    <div
+      className="
+        w-full md:w-1/4 bg-primary p-4 text-white relative
+        overflow-y-auto scrollbar-thin scrollbar-thumb-blue-500 scrollbar-track-blue-200
+        h-[40vh] md:h-full
+      "
     >
       <h2 className="text-xl font-bold mb-4 flex items-center">
         Productos
@@ -47,32 +59,29 @@ const Sidebar = ({ selectedProductId, onSelectProduct, onAddProduct, products })
         )}
       </h2>
 
-      {/* Absolute positioned sort toggle button */}
+      {/* Toggle sort button */}
       <button
         onClick={toggleSort}
         className="absolute top-4 right-4 bg-blue-500 text-white p-2 rounded-full flex items-center justify-center"
-        title={`Ordenar por ${sortBy === "creation" ? "Nombre" : "Creación"}`}
+        title={`Ordenar por ${sortBy === "updated" ? "Nombre" : "Última Actualización"}`}
       >
-        {sortBy === "creation" ? (
+        {sortBy === "updated" ? (
           <FaSortAlphaDown size={18} />
         ) : (
           <AiOutlineClockCircle size={18} />
         )}
       </button>
 
-      {/* Product List with Scrollable Logic */}
-      <ul
-
-      >
+      <ul>
         {sortedProducts.map((product) => (
           <li
-            key={product.id} // Use product.id as the unique key
+            key={product.id}
             className={`cursor-pointer p-2 mb-2 rounded-lg ${
               selectedProductId === product.id
-                ? "bg-lightAccent"
+                ? "bg-lightAccent text-white" // Highlight the selected product
                 : "hover:bg-secondary"
             }`}
-            onClick={() => onSelectProduct(product.id)} // Pass product.id
+            onClick={() => handleSelectProduct(product.id)} // Allow clicking to select
           >
             {product.name} ({product.code})
           </li>

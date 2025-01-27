@@ -7,9 +7,9 @@ import * as apiService from "../../services/apiService";
 import { useUser } from "../../contexts/UserContext";
 
 const Lotes = () => {
-  const { user } = useUser(); // Access the current user from context
+  const { user } = useUser();
   const [products, setProducts] = useState([]);
-  const [selectedProductId, setSelectedProductId] = useState(null); // Use product ID for uniqueness
+  const [selectedProductId, setSelectedProductId] = useState(null); // Selected product ID
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewProductModalOpen, setIsNewProductModalOpen] = useState(false);
 
@@ -18,9 +18,12 @@ const Lotes = () => {
       const data = await apiService.getAllProducts();
       setProducts(data);
 
-      // Set default selected product only if none is selected
-      if (data.length > 0 && selectedProductId === null) {
-        setSelectedProductId(data[0].id);
+      // Set the initial selection if no product is selected
+      if (!selectedProductId && data.length > 0) {
+        const lastCreatedProduct = [...data].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        )[0];
+        setSelectedProductId(lastCreatedProduct.id);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -82,57 +85,55 @@ const Lotes = () => {
   };
 
   return (
-      <div className="flex flex-col md:flex-row h-auto min-h-screen w-full md:max-w-[1200px] mx-0 md:mx-auto px-0 md:px-4">
+    <div className="flex flex-col md:flex-row h-auto min-h-screen w-full md:max-w-[1200px] mx-0 md:mx-auto px-0 md:px-4">
+      <Sidebar
+        selectedProductId={selectedProductId}
+        onSelectProduct={handleProductSelect}
+        onAddProduct={() => setIsNewProductModalOpen(true)}
+        products={products}
+      />
+      <div className="flex-1 p-6 bg-background">
+        <h1 className="text-2xl font-bold text-primary mb-4">
+          <span className="font-bold">{selectedProduct?.name}</span>
+        </h1>
 
-    <Sidebar
-      selectedProductId={selectedProductId}
-      onSelectProduct={handleProductSelect}
-      onAddProduct={() => setIsNewProductModalOpen(true)}
-      products={products}
-    />
-    <div className="flex-1 p-6 bg-background">
-      <h1 className="text-2xl font-bold text-primary mb-4">
-        <span className="font-bold">{selectedProduct?.name}</span>
-      </h1>
-  
-      {user && user.username && (
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="mb-4 bg-blue-500 text-white p-2 rounded"
-        >
-          + Agregar Medición
-        </button>
-      )}
-  
-      {selectedProduct?.Measurements?.length > 0 ? (
-        <Table
-          initialTime={selectedProduct.createdAt}
-          measurements={selectedProduct.Measurements.sort(
-            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-          )}
+        {user && user.username && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="mb-4 bg-blue-500 text-white p-2 rounded"
+          >
+            + Agregar Medición
+          </button>
+        )}
+
+        {selectedProduct?.Measurements?.length > 0 ? (
+          <Table
+            initialTime={selectedProduct.createdAt}
+            measurements={selectedProduct.Measurements.sort(
+              (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+            )}
+          />
+        ) : (
+          <p>No hay mediciones disponibles para este producto.</p>
+        )}
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          containers={selectedProduct?.Measurements?.[0]?.Containers || []}
+          latestContainers={selectedProduct?.Measurements?.[0]?.Containers || []}
+          addMeasurement={handleAddMeasurement}
+          productId={selectedProduct?.id}
         />
-      ) : (
-        <p>No hay mediciones disponibles para este producto.</p>
-      )}
-  
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        containers={selectedProduct?.Measurements?.[0]?.Containers || []}
-        latestContainers={selectedProduct?.Measurements?.[0]?.Containers || []}
-        addMeasurement={handleAddMeasurement}
-        productId={selectedProduct?.id}
-      />
-  
-      <NewProductModal
-        isOpen={isNewProductModalOpen}
-        onClose={() => setIsNewProductModalOpen(false)}
-        addProduct={handleAddProduct}
-        existingProductIds={products.map((product) => product.id)}
-      />
+
+        <NewProductModal
+          isOpen={isNewProductModalOpen}
+          onClose={() => setIsNewProductModalOpen(false)}
+          addProduct={handleAddProduct}
+          existingProductIds={products.map((product) => product.id)}
+        />
+      </div>
     </div>
-  </div>
-  
   );
 };
 
