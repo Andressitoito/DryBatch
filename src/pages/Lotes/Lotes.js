@@ -12,6 +12,7 @@ const Lotes = () => {
   const [selectedProductId, setSelectedProductId] = useState(null); // Selected product ID
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewProductModalOpen, setIsNewProductModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // New loading state
 
   const fetchProducts = async () => {
     try {
@@ -27,12 +28,20 @@ const Lotes = () => {
       }
     } catch (error) {
       console.error("Error fetching products:", error);
+    } finally {
+      setIsLoading(false); // Stop loading once data is fetched
     }
   };
 
   // Fetch all products on initial render
   useEffect(() => {
+    const loadingTimeout = setTimeout(() => {
+      setIsLoading(false); // Stop loading after 30 seconds
+    }, 30000); // 30 seconds
+
     fetchProducts();
+
+    return () => clearTimeout(loadingTimeout); // Clear timeout on component unmount
   }, []);
 
   const selectedProduct = products.find(
@@ -93,28 +102,39 @@ const Lotes = () => {
         products={products}
       />
       <div className="flex-1 p-6 bg-background">
-        <h1 className="text-2xl font-bold text-primary mb-4">
-          <span className="font-bold">{selectedProduct?.name}</span>
+        <h1 className="text-primary mb-4">
+        <span className="text-xl">Producto: </span> <span className="font-bold text-2xl italic uppercase">{selectedProduct?.name}</span>
+        </h1>
+        <h1 className=" text-primary mb-4">
+        <span className="text-xl">Lote: </span> <span className="font-bold text-2xl italic">{selectedProduct?.code}</span>
         </h1>
 
-        {user && user.username && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="mb-4 bg-blue-500 text-white p-2 rounded"
-          >
-            + Agregar Medición
-          </button>
-        )}
-
-        {selectedProduct?.Measurements?.length > 0 ? (
-          <Table
-            initialTime={selectedProduct.createdAt}
-            measurements={selectedProduct.Measurements.sort(
-              (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-            )}
-          />
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+          </div>
         ) : (
-          <p>No hay mediciones disponibles para este producto.</p>
+          <>
+            {user && user.username && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="mb-4 bg-blue-500 text-white p-2 rounded"
+              >
+                + Agregar Medición
+              </button>
+            )}
+
+            {selectedProduct?.Measurements?.length > 0 ? (
+              <Table
+                initialTime={selectedProduct.createdAt}
+                measurements={selectedProduct.Measurements.sort(
+                  (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+                )}
+              />
+            ) : (
+              <p>No hay mediciones disponibles para este producto.</p>
+            )}
+          </>
         )}
 
         <Modal
