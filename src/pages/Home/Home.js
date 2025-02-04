@@ -2,7 +2,7 @@ import React from "react";
 
 const Home = () => {
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
+    <div className="p-4 bg-gray-100 min-h-screen">
       {/* Header Section */}
       <header className="text-center py-8">
         <h1 className="text-4xl font-bold text-gray-800">Control de Medidas de Secado</h1>

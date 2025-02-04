@@ -46,7 +46,7 @@ const Login = () => {
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto bg-background rounded shadow">
+    <div className="p-4 max-w-md mx-auto bg-background rounded shadow my-5">
       <h2 className="text-2xl font-bold text-primary">Iniciar Sesión</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
