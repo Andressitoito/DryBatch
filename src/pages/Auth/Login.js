@@ -31,8 +31,10 @@ const Login = () => {
   
       // Update user context with server response
       const { user } = result; // Extract the user object from the response
-      console.log("from backend ", user)
-      updateUser(user.name, user.lastname); // Update user context with name and lastname
+      console.log("from backend ", user);
+      
+      // Update user context with name, lastname, and role
+      updateUser(user.name, user.lastname, user.role);
      
       reset(); // Clear all input fields
       navigate("/lotes"); // Redirect after a brief delay
@@ -54,16 +56,14 @@ const Login = () => {
           <input
             type="text"
             {...register("name", {
-              required: "El nombre es obligatorio", // Field is required
+              required: "El nombre es obligatorio",
               minLength: {
                 value: 2,
                 message: "El nombre debe tener al menos 2 caracteres",
               },
             })}
-            className={`border rounded w-full p-2 ${
-              errors.name ? "border-red-500" : ""
-            }`}
-            disabled={isLoading} // Disable input while loading
+            className={`border rounded w-full p-2 ${errors.name ? "border-red-500" : ""}`}
+            disabled={isLoading}
           />
           {errors.name && (
             <p className="text-red-500 text-sm">{errors.name.message}</p>
@@ -74,16 +74,14 @@ const Login = () => {
           <input
             type="text"
             {...register("lastname", {
-              required: "El apellido es obligatorio", // Field is required
+              required: "El apellido es obligatorio",
               minLength: {
                 value: 2,
                 message: "El apellido debe tener al menos 2 caracteres",
               },
             })}
-            className={`border rounded w-full p-2 ${
-              errors.lastname ? "border-red-500" : ""
-            }`}
-            disabled={isLoading} // Disable input while loading
+            className={`border rounded w-full p-2 ${errors.lastname ? "border-red-500" : ""}`}
+            disabled={isLoading}
           />
           {errors.lastname && (
             <p className="text-red-500 text-sm">{errors.lastname.message}</p>
@@ -94,16 +92,14 @@ const Login = () => {
           <input
             type="password"
             {...register("password", {
-              required: "La contraseña es obligatoria", // Field is required
+              required: "La contraseña es obligatoria",
               minLength: {
                 value: 8,
                 message: "La contraseña debe tener al menos 8 caracteres",
               },
             })}
-            className={`border rounded w-full p-2 ${
-              errors.password ? "border-red-500" : ""
-            }`}
-            disabled={isLoading} // Disable input while loading
+            className={`border rounded w-full p-2 ${errors.password ? "border-red-500" : ""}`}
+            disabled={isLoading}
           />
           {errors.password && (
             <p className="text-red-500 text-sm">{errors.password.message}</p>
@@ -111,13 +107,12 @@ const Login = () => {
         </div>
         {serverError && (
           <p className="text-red-500 text-sm text-center">{serverError}</p>
-        )}{" "}
-        {/* Display server error */}
+        )}
         <div className="flex justify-end">
           <button
             type="submit"
             className="bg-primary text-white py-2 px-4 rounded disabled:bg-gray-300 flex items-center"
-            disabled={!isValid || isLoading} // Disable button if form is invalid or loading
+            disabled={!isValid || isLoading}
           >
             {isLoading && (
               <svg
