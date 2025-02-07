@@ -1,11 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
-// import axios from "axios";
-
-// const BASE_URL = process.env.REACT_APP_BASE_URL;
-
-// const api = axios.create({
-//   baseURL: BASE_URL,
-// });
 
 // Create the UserContext
 const UserContext = createContext();
@@ -24,10 +17,10 @@ export const UserProvider = ({ children }) => {
     setLoading(false); // End loading state after checking localStorage
   }, []);
 
-  // Update user state with new data and save to localStorage
-  const updateUser = (name, lastname) => {
+  // Update user state with new data including role, and save to localStorage
+  const updateUser = (name, lastname, role) => {
     const username = `${capitalize(name)} ${capitalize(lastname)}`;
-    const updatedUser = { name, lastname, username };
+    const updatedUser = { name, lastname, username, role }; // Now includes role
     setUser(updatedUser);
     localStorage.setItem("drybatch", JSON.stringify(updatedUser));
   };
