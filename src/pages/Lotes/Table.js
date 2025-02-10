@@ -1,13 +1,32 @@
 import React from "react";
 
 const Table = ({ measurements }) => {
-  if (!measurements || measurements.length === 0) return <p>No hay mediciones disponibles.</p>;
+  if (!measurements || measurements.length === 0)
+    return <p>No hay mediciones disponibles.</p>;
 
+  // Format a number so that:
+  // - Thousands are separated by '.' and decimals by ','
+  // - Only show decimal digit if not zero.
+  const formatNumber = (value) => {
+    if (isNaN(value)) return "-";
+    const hasDecimal = Math.round(value * 10) % 10 !== 0;
+    return new Intl.NumberFormat("es-ES", {
+      minimumFractionDigits: hasDecimal ? 1 : 0,
+      maximumFractionDigits: hasDecimal ? 1 : 0,
+    }).format(value);
+  };
+
+  // Calculate the time elapsed between two timestamps (in hours)
+  // Returns a formatted string or null if invalid.
   const calculateTimeElapsed = (startTime, endTime) => {
     const start = new Date(startTime);
     const end = new Date(endTime);
-    const elapsedMs = end - start;
-    return (elapsedMs / (1000 * 60 * 60)).toFixed(1); // Convert ms to hours with one decimal
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return null;
+    }
+    const elapsedMs = Math.abs(end - start); // Use absolute difference
+    const hours = elapsedMs / (1000 * 60 * 60);
+    return formatNumber(hours);
   };
 
   return (
@@ -15,7 +34,7 @@ const Table = ({ measurements }) => {
       {measurements
         .slice() // Copy the array
         .map((measurement, groupIndex) => {
-          // Sort containers by `tare` and then by `id` for consistency
+          // Sort containers by tare and then by id for consistency
           const containers = [...measurement.Containers].sort((a, b) => {
             if (a.tare !== b.tare) return a.tare - b.tare;
             return a.id - b.id;
@@ -23,11 +42,22 @@ const Table = ({ measurements }) => {
 
           // Calculate totals for the current measurement
           const totalTare = containers.reduce((acc, cur) => acc + cur.tare, 0);
-          const totalInitialGross = containers.reduce((acc, cur) => acc + cur.initialGross, 0);
-          const totalCurrentGross = containers.reduce((acc, cur) => acc + cur.currentGross, 0);
-          const totalNetWeight = containers.reduce((acc, cur) => acc + (cur.currentGross - cur.tare), 0);
+          const totalInitialGross = containers.reduce(
+            (acc, cur) => acc + cur.initialGross,
+            0
+          );
+          const totalCurrentGross = containers.reduce(
+            (acc, cur) => acc + cur.currentGross,
+            0
+          );
+          const totalNetWeight = containers.reduce(
+            (acc, cur) => acc + (cur.currentGross - cur.tare),
+            0
+          );
           const totalWeightLoss = containers.reduce(
-            (acc, cur) => acc + (cur.initialGross - cur.tare - (cur.currentGross - cur.tare)),
+            (acc, cur) =>
+              acc +
+              (cur.initialGross - cur.tare - (cur.currentGross - cur.tare)),
             0
           );
 
@@ -36,26 +66,45 @@ const Table = ({ measurements }) => {
           const previousContainers = previousMeasurement?.Containers || [];
           const totalTimeElapsed =
             groupIndex === 0
-              ? calculateTimeElapsed(measurements[measurements.length - 1].timestamp, measurement.timestamp)
+              ? calculateTimeElapsed(
+                  measurements[measurements.length - 1].timestamp,
+                  measurement.timestamp
+                )
               : null;
 
           return (
-            <div key={groupIndex} className="mb-6 border-b-2 border-gray-800 pb-4">
+            <div
+              key={groupIndex}
+              className="mb-6 border-b-2 border-gray-800 pb-4"
+            >
               <table className="min-w-full bg-white">
                 <thead className="bg-gray-100 font-semibold">
                   <tr>
-                    <th className="px-4 py-2 border align-middle">Tara (gr)</th>
-                    <th className="px-4 py-2 border align-middle">Peso Bruto Inicial (gr)</th>
-                    <th className="px-4 py-2 border align-middle">Peso Bruto Actual (gr)</th>
-                    <th className="px-4 py-2 border align-middle">Pérdida de Peso (gr)</th>
-                    <th className="px-4 py-2 border align-middle">Cambio desde Anterior (gr)</th>
-                    <th className="px-4 py-2 border align-middle">Peso Neto (gr)</th>
+                    <th className="px-4 py-2 border align-middle">
+                      Tara (gr)
+                    </th>
+                    <th className="px-4 py-2 border align-middle">
+                      Peso Bruto Inicial (gr)
+                    </th>
+                    <th className="px-4 py-2 border align-middle">
+                      Peso Bruto Actual (gr)
+                    </th>
+                    <th className="px-4 py-2 border align-middle">
+                      Pérdida de Peso (gr)
+                    </th>
+                    <th className="px-4 py-2 border align-middle">
+                      Cambio desde Anterior (gr)
+                    </th>
+                    <th className="px-4 py-2 border align-middle">
+                      Peso Neto (gr)
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {containers.map((container, index) => {
                     const netWeight = container.currentGross - container.tare;
-                    const initialNetWeight = container.initialGross - container.tare;
+                    const initialNetWeight =
+                      container.initialGross - container.tare;
                     const weightLoss = initialNetWeight - netWeight;
 
                     // Calculate the difference from the previous measurement
@@ -65,30 +114,31 @@ const Table = ({ measurements }) => {
                       : null;
 
                     return (
-                      <tr key={index} className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}>
+                      <tr
+                        key={index}
+                        className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
+                      >
                         <td className="px-4 py-2 border text-center align-middle">
-                          {container.tare.toFixed(1)}
+                          {formatNumber(container.tare)}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
-                          {container.initialGross.toFixed(1)}
+                          {formatNumber(container.initialGross)}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
-                          {container.currentGross.toFixed(1)}
+                          {formatNumber(container.currentGross)}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
                           {weightLoss !== 0 ? (
                             <span
                               className={
                                 weightLoss > 0
-                                  ? "text-green-600 font-bold text-xl"
-                                  : "text-red-600 font-bold text-xl"
+                                  ? "inline-flex items-center text-green-600 font-bold text-xl"
+                                  : "inline-flex items-center text-red-600 font-bold text-xl"
                               }
                             >
-                              <span className="text-2xl font-bold">
-                                {weightLoss > 0 ? "↓" : "↑"}
-                              </span>{" "}
-                              <span className="text-base">
-                                {Math.abs(weightLoss).toFixed(1)}
+                              {weightLoss > 0 ? "↓" : "↑"}
+                              <span className="ml-1 text-base">
+                                {formatNumber(Math.abs(weightLoss))}
                               </span>
                             </span>
                           ) : (
@@ -100,15 +150,13 @@ const Table = ({ measurements }) => {
                             <span
                               className={
                                 differenceSinceLast < 0
-                                  ? "text-green-600 font-bold text-xl"
-                                  : "text-red-600 font-bold text-xl"
+                                  ? "inline-flex items-center text-green-600 font-bold text-xl"
+                                  : "inline-flex items-center text-red-600 font-bold text-xl"
                               }
                             >
-                              <span className="text-2xl font-bold">
-                                {differenceSinceLast < 0 ? "↓" : "↑"}
-                              </span>{" "}
-                              <span className="text-base">
-                                {Math.abs(differenceSinceLast).toFixed(1)}
+                              {differenceSinceLast < 0 ? "↓" : "↑"}
+                              <span className="ml-1 text-base">
+                                {formatNumber(Math.abs(differenceSinceLast))}
                               </span>
                             </span>
                           ) : (
@@ -116,7 +164,7 @@ const Table = ({ measurements }) => {
                           )}
                         </td>
                         <td className="px-4 py-2 border text-center align-middle">
-                          {netWeight.toFixed(1)}
+                          {formatNumber(netWeight)}
                         </td>
                       </tr>
                     );
@@ -125,20 +173,20 @@ const Table = ({ measurements }) => {
                   {/* Total row */}
                   <tr className="font-semibold italic align-middle bg-gray-200">
                     <td className="px-4 py-2 border text-center">
-                      {totalTare.toFixed(1)}
+                      {formatNumber(totalTare)}
                     </td>
                     <td className="px-4 py-2 border text-center">
-                      {totalInitialGross.toFixed(1)}
+                      {formatNumber(totalInitialGross)}
                     </td>
                     <td className="px-4 py-2 border text-center">
-                      {totalCurrentGross.toFixed(1)}
+                      {formatNumber(totalCurrentGross)}
                     </td>
                     <td className="px-4 py-2 border text-center">
-                      {totalWeightLoss.toFixed(1)}
+                      {formatNumber(totalWeightLoss)}
                     </td>
                     <td className="px-4 py-2 border text-center">-</td>
                     <td className="px-4 py-2 border text-center">
-                      {totalNetWeight.toFixed(1)}
+                      {formatNumber(totalNetWeight)}
                     </td>
                   </tr>
                   {/* Last row with user and timestamp */}
@@ -159,9 +207,12 @@ const Table = ({ measurements }) => {
                         .replace(",", " ")}
                     </td>
                     <td className="px-4 py-2 border text-center">
+                      <span>
+
                       {groupIndex === 0 && totalTimeElapsed
-                        ? `${totalTimeElapsed} hs`
+                        ? `${totalTimeElapsed}hs`
                         : "-"}
+                        </span>
                     </td>
                   </tr>
                 </tbody>
