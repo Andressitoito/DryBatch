@@ -24,55 +24,29 @@ const Navbar = () => {
 
   return (
     <header className="font-lato">
-      {/* Combined Navbar */}
       <nav className="bg-gray-300 text-gray-700 shadow-sm text-primary">
         <div className="container mx-auto p-2">
           <div className="flex justify-between items-center">
-            {/* Left Side - Navigation Links */}
             <div className="flex space-x-8">
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `px-3 py-1 rounded-md transition-all duration-200 ${
-                    isActive
-                      ? "bg-blue-400 text-white font-bold" // Active tab style
-                      : "hover:bg-blue-100 hover:text-blue-600" // Inactive tab style
-                  }`
-                }
-              >
+              <NavLink to="/" className={({ isActive }) =>
+                `px-3 py-1 rounded-md transition-all duration-200 ${isActive ? "bg-blue-400 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
+              }>
                 Inicio
               </NavLink>
               {user && (
-                <NavLink
-                  to="/lotes"
-                  className={({ isActive }) =>
-                    `px-3 py-1 rounded-md transition-all duration-200 ${
-                      isActive
-                        ? "bg-blue-400 text-white font-bold" // Active tab style
-                        : "hover:bg-blue-100 hover:text-blue-600" // Inactive tab style
-                    }`
-                  }
-                >
+                <NavLink to="/lotes" className={({ isActive }) =>
+                  `px-3 py-1 rounded-md transition-all duration-200 ${isActive ? "bg-blue-400 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
+                }>
                   Lotes
                 </NavLink>
               )}
-              <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                  `px-3 py-1 rounded-md transition-all duration-200 ${
-                    isActive
-                      ? "bg-blue-400 text-white font-bold" // Active tab style
-                      : "hover:bg-blue-100 hover:text-blue-600" // Inactive tab style
-                  }`
-                }
-              >
+              <NavLink to="/about" className={({ isActive }) =>
+                `hidden md:block px-3 py-1 rounded-md transition-all duration-200 ${isActive ? "bg-blue-400 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
+              }>
                 Acerca de Nosotros
               </NavLink>
             </div>
-
-            {/* Right Side - User Controls */}
             <div className="flex items-center space-x-4">
-              {/* Desktop View */}
               <div className="hidden md:flex items-center space-x-4">
                 {user ? (
                   <>
@@ -89,11 +63,7 @@ const Navbar = () => {
                   <NavLink
                     to="/login"
                     className={({ isActive }) =>
-                      `p-2 rounded-md transition-colors duration-200 ${
-                        isActive
-                          ? "bg-blue-600 text-white font-bold" // Active tab style
-                          : "hover:bg-blue-100 hover:text-blue-600" // Inactive tab style
-                      }`
+                      `p-2 rounded-md transition-colors duration-200 ${isActive ? "bg-blue-600 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
                     }
                     title="Iniciar Sesión"
                   >
@@ -101,8 +71,6 @@ const Navbar = () => {
                   </NavLink>
                 )}
               </div>
-
-              {/* Mobile Burger Button */}
               <button
                 className="md:hidden text-2xl text-gray-700"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -111,8 +79,6 @@ const Navbar = () => {
               </button>
             </div>
           </div>
-
-          {/* Mobile Menu */}
           {isMenuOpen && (
             <div
               ref={menuRef}
@@ -135,11 +101,7 @@ const Navbar = () => {
                 <NavLink
                   to="/login"
                   className={({ isActive }) =>
-                    `block px-3 py-2 rounded-md transition-all duration-200 ${
-                      isActive
-                        ? "bg-blue-600 text-white font-bold" // Active tab style
-                        : "hover:bg-blue-100 hover:text-blue-600" // Inactive tab style
-                    }`
+                    `block px-3 py-2 rounded-md transition-all duration-200 ${isActive ? "bg-blue-600 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
                   }
                 >
                   <FaSignInAlt className="inline-block mr-2" /> Iniciar Sesión
