@@ -2,7 +2,7 @@ import React from "react";
 
 const Table = ({ measurements }) => {
   if (!measurements || measurements.length === 0)
-    return <p>No hay mediciones disponibles.</p>;
+    return <p></p>;
 
   const formatNumber = (value) => {
     if (isNaN(value)) return "-";
