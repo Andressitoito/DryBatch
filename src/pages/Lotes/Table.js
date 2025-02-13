@@ -1,8 +1,10 @@
 import React from "react";
 
-const Table = ({ measurements }) => {
+const Table = ({ measurements, initialTime }) => {
   if (!measurements || measurements.length === 0)
-    return <p></p>;
+    return <p>No hay mediciones disponibles.</p>;
+
+  console.log("initial time ", initialTime)
 
   const formatNumber = (value) => {
     if (isNaN(value)) return "-";
@@ -27,13 +29,11 @@ const Table = ({ measurements }) => {
   return (
     <div className="overflow-x-auto">
       {measurements.slice().map((measurement, groupIndex) => {
-        // Sort containers by tare then by id for consistency
+        // (Other calculations for containers remain unchanged)
         const containers = [...measurement.Containers].sort((a, b) => {
           if (a.tare !== b.tare) return a.tare - b.tare;
           return a.id - b.id;
         });
-
-        // Calculate totals for the current measurement
         const totalTare = containers.reduce((acc, cur) => acc + cur.tare, 0);
         const totalInitialGross = containers.reduce(
           (acc, cur) => acc + cur.initialGross,
@@ -47,20 +47,13 @@ const Table = ({ measurements }) => {
           (acc, cur) => acc + (cur.currentGross - cur.tare),
           0
         );
-        // Updated: Weight loss is now initialGross minus currentGross
         const totalWeightLoss = containers.reduce(
           (acc, cur) => acc + (cur.initialGross - cur.currentGross),
           0
         );
 
-        // Get the previous measurement (next in array since measurements are ordered latest to oldest)
-        const previousMeasurement = measurements[groupIndex + 1];
-        const totalTimeElapsed = previousMeasurement
-          ? calculateTimeElapsed(
-            previousMeasurement.timestamp,
-            measurement.timestamp
-          )
-          : null;
+        // Calculate the cumulative elapsed time from the very start to this measurement
+        const totalTimeElapsed = calculateTimeElapsed(initialTime, measurement.updatedAt);
 
         return (
           <div
@@ -70,9 +63,7 @@ const Table = ({ measurements }) => {
             <table className="min-w-full bg-white">
               <thead className="bg-gray-100 font-semibold">
                 <tr>
-                  <th className="px-4 py-2 border align-middle">
-                    Tara (gr)
-                  </th>
+                  <th className="px-4 py-2 border align-middle">Tara (gr)</th>
                   <th className="px-4 py-2 border align-middle">
                     Peso Bruto Inicial (gr)
                   </th>
@@ -92,13 +83,11 @@ const Table = ({ measurements }) => {
               </thead>
               <tbody>
                 {containers.map((container, index) => {
-                  // Net weight: currentGross minus tare
                   const netWeight = container.currentGross - container.tare;
-                  // Weight loss: initialGross minus currentGross
                   const weightLoss = container.initialGross - container.currentGross;
-
-                  // Calculate the difference from the previous measurement's container (if exists)
-                  const previousContainer = previousMeasurement?.Containers[index];
+                  // Calculate difference from the previous measurement's container if it exists
+                  const previousContainer =
+                    measurements[groupIndex + 1]?.Containers[index];
                   const differenceSinceLast = previousContainer
                     ? container.currentGross - previousContainer.currentGross
                     : null;
@@ -185,7 +174,7 @@ const Table = ({ measurements }) => {
                     {measurement.lastUpdatedBy}
                   </td>
                   <td className="px-4 py-2 border text-left" colSpan={3}>
-                    {new Date(measurement.timestamp)
+                    {new Date(measurement.updatedAt)
                       .toLocaleDateString("es-ES", {
                         weekday: "long",
                         day: "2-digit",
@@ -198,7 +187,10 @@ const Table = ({ measurements }) => {
                   </td>
                   <td className="px-4 py-2 border text-center">
                     <span>
-                      {totalTimeElapsed ? `${totalTimeElapsed}hs` : "Inicio"}
+                      {totalTimeElapsed &&
+                      Number(totalTimeElapsed) !== 0
+                        ? `${totalTimeElapsed}hs`
+                        : "Inicio"}
                     </span>
                   </td>
                 </tr>
