@@ -31,7 +31,6 @@ const Login = () => {
   
       // Update user context with server response
       const { user } = result; // Extract the user object from the response
-      console.log("from backend ", user)
       updateUser(user.name, user.lastname); // Update user context with name and lastname
      
       reset(); // Clear all input fields
