@@ -116,7 +116,7 @@ const Lotes = () => {
         products={products}
       />
       <div className="flex-1 p-6 bg-background">
-        <h1 className="text-primary mb-4">
+        <h1 className="text-primary mb-0">
           <span className="text-xl text-blue-500">Producto: </span><br/>
           <span className="font-bold text-2xl italic uppercase">
             {selectedProduct?.name}
