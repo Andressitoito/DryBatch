@@ -5,6 +5,7 @@ import Home from "./pages/Home/Home";
 import Login from "./pages/Auth/Login";
 import Lotes from "./pages/Lotes/Lotes";
 import About from "./pages/About/About";
+import History from "./pages/History/History";
 import CreateUser from "./pages/Auth/SignIn";
 import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRoute
 import "@fontsource/lato"; // Defaults to weight 400
@@ -17,6 +18,7 @@ const App = () => {
 				<Routes>
 					<Route path="/" element={<Home />} />
 					<Route path="/login" element={<Login />} />
+					<Route path="/historial" element={<History />} />
 					<Route path="/auth/mHlMAi8ExJ17Euc/SignIn" element={<CreateUser />} />
 					<Route path="/about" element={<About />} />
 					

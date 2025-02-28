@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { NavLink } from "react-router-dom";
 import { FaBars, FaTimes, FaUser, FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
 import { useUser } from "../../contexts/UserContext";
+import NavItem from "../../components/NavItem"; // Adjust path as needed
 
 const Navbar = () => {
   const { user, clearUser } = useUser();
@@ -28,23 +28,14 @@ const Navbar = () => {
         <div className="container mx-auto p-2">
           <div className="flex justify-between items-center">
             <div className="flex space-x-8">
-              <NavLink to="/" className={({ isActive }) =>
-                `px-3 py-1 rounded-md transition-all duration-200 ${isActive ? "bg-blue-400 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
-              }>
-                Inicio
-              </NavLink>
-              {user && (
-                <NavLink to="/lotes" className={({ isActive }) =>
-                  `px-3 py-1 rounded-md transition-all duration-200 ${isActive ? "bg-blue-400 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
-                }>
-                  Lotes
-                </NavLink>
-              )}
-              <NavLink to="/about" className={({ isActive }) =>
-                `hidden md:block px-3 py-1 rounded-md transition-all duration-200 ${isActive ? "bg-blue-400 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
-              }>
-                Acerca de Nosotros
-              </NavLink>
+              <NavItem name="Inicio" to="/" />
+              <NavItem name="Historial" to="/historial" />
+              <NavItem name="Lotes" to="/lotes" authRequired />
+              <NavItem
+                name="Acerca de Nosotros"
+                to="/about"
+                className="hidden md:block"
+              />
             </div>
             <div className="flex items-center space-x-4">
               <div className="hidden md:flex items-center space-x-4">
@@ -60,15 +51,11 @@ const Navbar = () => {
                     </button>
                   </>
                 ) : (
-                  <NavLink
+                  <NavItem
+                    name={<FaSignInAlt className="text-xl" />}
                     to="/login"
-                    className={({ isActive }) =>
-                      `p-2 rounded-md transition-colors duration-200 ${isActive ? "bg-blue-600 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
-                    }
-                    title="Iniciar Sesión"
-                  >
-                    <FaSignInAlt className="text-xl" />
-                  </NavLink>
+                    className="p-2"
+                  />
                 )}
               </div>
               <button
@@ -98,14 +85,15 @@ const Navbar = () => {
                   </button>
                 </>
               ) : (
-                <NavLink
-                  to="/login"
-                  className={({ isActive }) =>
-                    `block px-3 py-2 rounded-md transition-all duration-200 ${isActive ? "bg-blue-600 text-white font-bold" : "hover:bg-blue-100 hover:text-blue-600"}`
+                <NavItem
+                  name={
+                    <>
+                      <FaSignInAlt className="inline-block mr-2" /> Iniciar Sesión
+                    </>
                   }
-                >
-                  <FaSignInAlt className="inline-block mr-2" /> Iniciar Sesión
-                </NavLink>
+                  to="/login"
+                  className="block"
+                />
               )}
             </div>
           )}
